@@ -4,13 +4,13 @@ import tensorflow as tf
 # but implements a mLSTM cell as above
 
 
-class mLSTMCell(tf.nn.rnn_cell.RNNCell):
+class mLSTMCell(tf.compat.v1.nn.rnn_cell.RNNCell):
 
     def __init__(self,
                  num_units,
-                 weight_initializer=tf.orthogonal_initializer(),
-                 bias_initializer=tf.constant_initializer(3),
-                 wn_initializer=tf.ones_initializer(),
+                 weight_initializer=tf.compat.v1.orthogonal_initializer(),
+                 bias_initializer=tf.compat.v1.constant_initializer(3),
+                 wn_initializer=tf.compat.v1.ones_initializer(),
                  wn=True,
                  scope='mlstm',
                  var_device='cpu:0',
@@ -47,32 +47,32 @@ class mLSTMCell(tf.nn.rnn_cell.RNNCell):
 
         # Unpack the state tuple
         c_prev, h_prev = state
-        with tf.variable_scope(self._scope):
-            wx = tf.get_variable(
+        with tf.compat.v1.variable_scope(self._scope):
+            wx = tf.compat.v1.get_variable(
                 "wx", [nin, self._num_units * 4], initializer=self._weight_initializer)
-            wh = tf.get_variable(
+            wh = tf.compat.v1.get_variable(
                 "wh", [self._num_units, self._num_units * 4], initializer=self._weight_initializer)
-            wmx = tf.get_variable(
+            wmx = tf.compat.v1.get_variable(
                 "wmx", [nin, self._num_units], initializer=self._weight_initializer)
-            wmh = tf.get_variable(
+            wmh = tf.compat.v1.get_variable(
                 "wmh", [self._num_units, self._num_units], initializer=self._weight_initializer)
-            b = tf.get_variable(
+            b = tf.compat.v1.get_variable(
                 "b", [self._num_units * 4], initializer=self._bias_initializer)
             if self._wn:
-                gx = tf.get_variable(
+                gx = tf.compat.v1.get_variable(
                     "gx", [self._num_units * 4], initializer=self._wn_initializer)
-                gh = tf.get_variable(
+                gh = tf.compat.v1.get_variable(
                     "gh", [self._num_units * 4], initializer=self._wn_initializer)
-                gmx = tf.get_variable(
+                gmx = tf.compat.v1.get_variable(
                     "gmx", [self._num_units], initializer=self._wn_initializer)
-                gmh = tf.get_variable(
+                gmh = tf.compat.v1.get_variable(
                     "gmh", [self._num_units], initializer=self._wn_initializer)
 
         if self._wn:
-            wx = tf.nn.l2_normalize(wx, dim=0) * gx
-            wh = tf.nn.l2_normalize(wh, dim=0) * gh
-            wmx = tf.nn.l2_normalize(wmx, dim=0) * gmx
-            wmh = tf.nn.l2_normalize(wmh, dim=0) * gmh
+            wx = tf.nn.l2_normalize(wx, axis=0) * gx
+            wh = tf.nn.l2_normalize(wh, axis=0) * gh
+            wmx = tf.nn.l2_normalize(wmx, axis=0) * gmx
+            wmh = tf.nn.l2_normalize(wmh, axis=0) * gmh
         m = tf.matmul(inputs, wmx) * tf.matmul(h_prev, wmh)
         z = tf.matmul(inputs, wx) + tf.matmul(m, wh) + b
         i, f, o, u = tf.split(z, 4, 1)
@@ -84,16 +84,16 @@ class mLSTMCell(tf.nn.rnn_cell.RNNCell):
         h = o * tf.tanh(c)
         return h, (c, h)
 
-class mLSTMCellStack(tf.nn.rnn_cell.RNNCell):
+class mLSTMCellStack(tf.compat.v1.nn.rnn_cell.RNNCell):
 
     def __init__(self,
                  num_units,
                  num_layers=1,
                  dropout=None,
                  res_connect=True,
-                 weight_initializer=tf.orthogonal_initializer(),
-                 bias_initializer=tf.constant_initializer(3),
-                 wn_initializer=tf.ones_initializer(),
+                 weight_initializer=tf.compat.v1.orthogonal_initializer(),
+                 bias_initializer=tf.compat.v1.constant_initializer(3),
+                 wn_initializer=tf.compat.v1.ones_initializer(),
                  wn=True,
                  scope='mlstm_stack',
                  var_device='cpu:0',
@@ -172,13 +172,13 @@ class mLSTMCellStack(tf.nn.rnn_cell.RNNCell):
         return final_output, (tuple(new_cs), tuple(new_hs))
 
 
-class myLSTMCell(tf.nn.rnn_cell.RNNCell):
+class myLSTMCell(tf.compat.v1.nn.rnn_cell.RNNCell):
 
     def __init__(self,
                  num_units,
-                 weight_initializer=tf.orthogonal_initializer(),
-                 bias_initializer=tf.constant_initializer(3),
-                 wn_initializer=tf.ones_initializer(),
+                 weight_initializer=tf.compat.v1.orthogonal_initializer(),
+                 bias_initializer=tf.compat.v1.constant_initializer(3),
+                 wn_initializer=tf.compat.v1.ones_initializer(),
                  wn=True,
                  scope='lstm',
                  var_device='cpu:0',
@@ -214,64 +214,64 @@ class myLSTMCell(tf.nn.rnn_cell.RNNCell):
 
         # Unpack the state tuple
         c_prev, h_prev = state
-        with tf.variable_scope(self._scope):
+        with tf.compat.v1.variable_scope(self._scope):
             # Weights from input to hidden layer
-            wxg = tf.get_variable(
+            wxg = tf.compat.v1.get_variable(
                 "wxg", [nin, self._num_units], initializer=self._weight_initializer)
-            wxi = tf.get_variable(
+            wxi = tf.compat.v1.get_variable(
                 "wxi", [nin, self._num_units], initializer=self._weight_initializer)
-            wxf = tf.get_variable(
+            wxf = tf.compat.v1.get_variable(
                 "wxf", [nin, self._num_units], initializer=self._weight_initializer)
-            wxo = tf.get_variable(
+            wxo = tf.compat.v1.get_variable(
                 "wxo", [nin, self._num_units], initializer=self._weight_initializer)
             # Weights from hidden (-1) to hidden layer
-            whg = tf.get_variable(
+            whg = tf.compat.v1.get_variable(
                 "whg", [self._num_units, self._num_units], initializer=self._weight_initializer)
-            whi = tf.get_variable(
+            whi = tf.compat.v1.get_variable(
                 "whi", [self._num_units, self._num_units], initializer=self._weight_initializer)
-            whf = tf.get_variable(
+            whf = tf.compat.v1.get_variable(
                 "whf", [self._num_units, self._num_units], initializer=self._weight_initializer)
-            who = tf.get_variable(
+            who = tf.compat.v1.get_variable(
                 "who", [self._num_units, self._num_units], initializer=self._weight_initializer)
             
             # Biases
-            bg = tf.get_variable(
-                "bg", [self._num_units], initializer=tf.constant_initializer(0))
-            bi = tf.get_variable(
-                "bi", [self._num_units], initializer=tf.constant_initializer(0))
+            bg = tf.compat.v1.get_variable(
+                "bg", [self._num_units], initializer=tf.compat.v1.constant_initializer(0))
+            bi = tf.compat.v1.get_variable(
+                "bi", [self._num_units], initializer=tf.compat.v1.constant_initializer(0))
             # Forget bias should be nonzero
-            bf = tf.get_variable(
+            bf = tf.compat.v1.get_variable(
                 "bf", [self._num_units], initializer=self._bias_initializer)
-            bo = tf.get_variable(
-                "bo", [self._num_units], initializer=tf.constant_initializer(0))
+            bo = tf.compat.v1.get_variable(
+                "bo", [self._num_units], initializer=tf.compat.v1.constant_initializer(0))
 
             if self._wn:
-                gxg = tf.get_variable(
+                gxg = tf.compat.v1.get_variable(
                     "gxg", [self._num_units], initializer=self._wn_initializer)
-                gxi = tf.get_variable(
+                gxi = tf.compat.v1.get_variable(
                     "gxi", [self._num_units], initializer=self._wn_initializer)
-                gxf = tf.get_variable(
+                gxf = tf.compat.v1.get_variable(
                     "gxf", [self._num_units], initializer=self._wn_initializer)
-                gxo = tf.get_variable(
+                gxo = tf.compat.v1.get_variable(
                     "gxo", [self._num_units], initializer=self._wn_initializer)
-                ghg = tf.get_variable(
+                ghg = tf.compat.v1.get_variable(
                     "ghg", [self._num_units], initializer=self._wn_initializer)
-                ghi = tf.get_variable(
+                ghi = tf.compat.v1.get_variable(
                     "ghi", [self._num_units], initializer=self._wn_initializer)
-                ghf = tf.get_variable(
+                ghf = tf.compat.v1.get_variable(
                     "ghf", [self._num_units], initializer=self._wn_initializer)
-                gho = tf.get_variable(
+                gho = tf.compat.v1.get_variable(
                     "gho", [self._num_units], initializer=self._wn_initializer)
 
         if self._wn:
-            wxg = tf.nn.l2_normalize(wxg, dim=0) * gxg
-            wxi = tf.nn.l2_normalize(wxi, dim=0) * gxi
-            wxf = tf.nn.l2_normalize(wxf, dim=0) * gxf
-            wxo = tf.nn.l2_normalize(wxo, dim=0) * gxo
-            whg = tf.nn.l2_normalize(whg, dim=0) * ghg
-            whi = tf.nn.l2_normalize(whi, dim=0) * ghi
-            whf = tf.nn.l2_normalize(whf, dim=0) * ghf
-            who = tf.nn.l2_normalize(who, dim=0) * gho
+            wxg = tf.nn.l2_normalize(wxg, axis=0) * gxg
+            wxi = tf.nn.l2_normalize(wxi, axis=0) * gxi
+            wxf = tf.nn.l2_normalize(wxf, axis=0) * gxf
+            wxo = tf.nn.l2_normalize(wxo, axis=0) * gxo
+            whg = tf.nn.l2_normalize(whg, axis=0) * ghg
+            whi = tf.nn.l2_normalize(whi, axis=0) * ghi
+            whf = tf.nn.l2_normalize(whf, axis=0) * ghf
+            who = tf.nn.l2_normalize(who, axis=0) * gho
 
         g = tf.nn.tanh(tf.matmul(inputs, wxg) + tf.matmul(h_prev, whg) + bg)
         i = tf.nn.sigmoid(tf.matmul(inputs, wxi) + tf.matmul(h_prev, whi) + bi)
@@ -282,16 +282,16 @@ class myLSTMCell(tf.nn.rnn_cell.RNNCell):
         h = o * tf.nn.tanh(c)
         return h, (c, h) 
 
-class myGRUCell(tf.nn.rnn_cell.RNNCell):
+class myGRUCell(tf.compat.v1.nn.rnn_cell.RNNCell):
     """ 
     To keep the signature of the other LSTM classes, this will
     return a duplicate tuple of the hidden state and another hidden state
     """
     def __init__(self,
                  num_units,
-                 weight_initializer=tf.orthogonal_initializer(),
-                 bias_initializer=tf.constant_initializer(0),
-                 wn_initializer=tf.ones_initializer(),
+                 weight_initializer=tf.compat.v1.orthogonal_initializer(),
+                 bias_initializer=tf.compat.v1.constant_initializer(0),
+                 wn_initializer=tf.compat.v1.ones_initializer(),
                  wn=True,
                  scope='gru',
                  var_device='cpu:0',
@@ -327,54 +327,54 @@ class myGRUCell(tf.nn.rnn_cell.RNNCell):
 
         # Unpack the state tuple
         h_prev, __ = state
-        with tf.variable_scope(self._scope):
+        with tf.compat.v1.variable_scope(self._scope):
             # Weights from input to hidden layer
-            wxz = tf.get_variable(
+            wxz = tf.compat.v1.get_variable(
                 "wxf", [nin, self._num_units], initializer=self._weight_initializer)
-            wxr = tf.get_variable(
+            wxr = tf.compat.v1.get_variable(
                 "wxr", [nin, self._num_units], initializer=self._weight_initializer)
-            wxh = tf.get_variable(
+            wxh = tf.compat.v1.get_variable(
                 "wxh", [nin, self._num_units], initializer=self._weight_initializer)
 
             # Weights from hidden (-1) to hidden layer
-            whz = tf.get_variable(
+            whz = tf.compat.v1.get_variable(
                 "whg", [self._num_units, self._num_units], initializer=self._weight_initializer)
-            whr = tf.get_variable(
+            whr = tf.compat.v1.get_variable(
                 "whi", [self._num_units, self._num_units], initializer=self._weight_initializer)
-            whh = tf.get_variable(
+            whh = tf.compat.v1.get_variable(
                 "whf", [self._num_units, self._num_units], initializer=self._weight_initializer)
 
             
             # Biases
-            bz = tf.get_variable(
-                "bz", [self._num_units], initializer=tf.constant_initializer(0))
-            br = tf.get_variable(
-                "br", [self._num_units], initializer=tf.constant_initializer(0))
-            bh = tf.get_variable(
+            bz = tf.compat.v1.get_variable(
+                "bz", [self._num_units], initializer=tf.compat.v1.constant_initializer(0))
+            br = tf.compat.v1.get_variable(
+                "br", [self._num_units], initializer=tf.compat.v1.constant_initializer(0))
+            bh = tf.compat.v1.get_variable(
                 "bh", [self._num_units], initializer=self._bias_initializer)
 
             if self._wn:
-                gxz = tf.get_variable(
+                gxz = tf.compat.v1.get_variable(
                     "gxz", [self._num_units], initializer=self._wn_initializer)
-                gxr = tf.get_variable(
+                gxr = tf.compat.v1.get_variable(
                     "gxr", [self._num_units], initializer=self._wn_initializer)
-                gxh = tf.get_variable(
+                gxh = tf.compat.v1.get_variable(
                     "gxh", [self._num_units], initializer=self._wn_initializer)
-                ghz = tf.get_variable(
+                ghz = tf.compat.v1.get_variable(
                     "ghz", [self._num_units], initializer=self._wn_initializer)
-                ghr = tf.get_variable(
+                ghr = tf.compat.v1.get_variable(
                     "ghr", [self._num_units], initializer=self._wn_initializer)
-                ghh = tf.get_variable(
+                ghh = tf.compat.v1.get_variable(
                     "ghh", [self._num_units], initializer=self._wn_initializer)
 
 
         if self._wn:
-            wxz = tf.nn.l2_normalize(wxz, dim=0) * gxz
-            wxr = tf.nn.l2_normalize(wxr, dim=0) * gxr
-            wxh = tf.nn.l2_normalize(wxh, dim=0) * gxh
-            whz = tf.nn.l2_normalize(whz, dim=0) * ghz
-            whr = tf.nn.l2_normalize(whr, dim=0) * ghr
-            whh = tf.nn.l2_normalize(whh, dim=0) * ghh
+            wxz = tf.nn.l2_normalize(wxz, axis=0) * gxz
+            wxr = tf.nn.l2_normalize(wxr, axis=0) * gxr
+            wxh = tf.nn.l2_normalize(wxh, axis=0) * gxh
+            whz = tf.nn.l2_normalize(whz, axis=0) * ghz
+            whr = tf.nn.l2_normalize(whr, axis=0) * ghr
+            whh = tf.nn.l2_normalize(whh, axis=0) * ghh
 
 
         z = tf.nn.sigmoid(tf.matmul(inputs, wxz) + tf.matmul(h_prev, whz) + bz)

@@ -1,4 +1,6 @@
 awscli==1.16.90
+tensorflow==2.1.0
+tensorflow_addons==0.8.3
 numpy==1.15.4
 pandas==0.23.4
 jupyter==1.0.0
